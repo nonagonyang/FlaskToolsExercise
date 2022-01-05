@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ survey_title }}</h1>
+<p>
+  {{ survey_instructions }}
+</p>
+<!-- The button should serve as a link that directs the user to /questions/0  -->
+<form action="/questions/0" method="POST">
+  <button>Start the Survey</button>
+</form>
+{% endblock %}
