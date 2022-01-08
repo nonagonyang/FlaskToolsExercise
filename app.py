@@ -3,10 +3,10 @@
 # keep track of the user’s survey responses with this list
 # As people answer questions, their answers get stored in this list.
 
-responses=[]
+
 
 # make a server with flask
-from flask import Flask,render_template,request,redirect,flash
+from flask import Flask,render_template,request,redirect,flash,session
 from flask_debugtoolbar import DebugToolbarExtension
 app= Flask(__name__)
 app.config['SECRET_KEY'] = 'surveykeykey'
@@ -28,7 +28,10 @@ def show_survey():
     return render_template("home.html",survey_title=survey_title,survey_instruction=survey_instruction)
 
 @app.route("/begin", methods=["POST"])
+# modify your start page so that clicking on the button fires off a POST request to a new route 
+# that will set session[“responses”] to an empty list
 def start_survey():
+    session['responses']=[]
     return redirect("/questions/0")
 
 
@@ -41,6 +44,7 @@ def start_survey():
 # and listing the choices as radio buttons. 
 @app.route("/questions/<int:questionid>")
 def show_question(questionid):
+    responses = session.get('responses')
     if (len(responses) != questionid):
         # Trying to access questions out of order.
         flash(f"Invalid question id: {questionid}.")
@@ -59,7 +63,11 @@ def show_question(questionid):
 @app.route("/answer", methods=["POST"])
 def handle_answer():
     answer=request.form["answer"]
-    responses.append(answer)
+    # for a list stored in the session, you’ll need to rebind the name in the session
+    responses = session['responses']
+    responses.append("answer")
+    session['responses'] = responses
+
     if (len(responses) == len(satisfaction_survey.questions)):
         # They've answered all the questions! Thank them.
         return redirect("/thankyou")
